@@ -1,0 +1,13 @@
+global:
+  enabled: false
+injector:
+  enabled: true
+  externalVaultAddr: https://vaultaz.secretmgmt.aa.com
+server:
+  enabled: true
+  service:
+    enabled: false
+  dataStorage:
+    enabled: false
+  standalone:
+    enabled: false

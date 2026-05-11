@@ -1,0 +1,5 @@
+---
+defaultVaultConnection:
+  enabled: true
+  address: "https://vaultaz.secretmgmt.aa.com"
+  caCertSecret: "vault-ca-cert"
