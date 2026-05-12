@@ -159,6 +159,12 @@ variable "eni_configs" {
   # }
 }
 
+variable "pod_subnet_cidrs" {
+  description = "CIDR blocks for dedicated pod subnets, one per availability zone. Uses the CGNAT range (100.64.0.0/x) so pod IPs do not consume addresses from the VPC CIDR, avoiding IP exhaustion. Set to an empty list to disable custom pod networking."
+  type        = list(string)
+  default     = ["100.64.0.0/18", "100.64.64.0/18", "100.64.128.0/18"]
+}
+
 variable "platform_admin_role_arns" {
   description = "List of IAM role ARNs to grant cluster admin access via EKS Access Entries"
   type        = list(string)

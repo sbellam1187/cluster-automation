@@ -45,9 +45,15 @@ variable "public_subnet_cidrs" {
 }
 
 variable "private_subnet_cidrs" {
-  description = "Private subnet CIDR blocks"
+  description = "Private subnet CIDR blocks (used for node IPs)"
   type        = list(string)
   default     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+}
+
+variable "pod_subnet_cidrs" {
+  description = "CIDR blocks for pod subnets, one per availability zone. Uses the CGNAT range (100.64.0.0/x) to keep pod IPs in a completely separate space from node and service IPs, avoiding VPC CIDR exhaustion. Set to an empty list to disable custom pod networking."
+  type        = list(string)
+  default     = ["100.64.0.0/18", "100.64.64.0/18", "100.64.128.0/18"]
 }
 
 ################################################################################

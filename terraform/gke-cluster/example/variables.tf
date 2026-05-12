@@ -57,9 +57,21 @@ variable "network_cidr" {
 }
 
 variable "subnet_primary_cidr" {
-  description = "Primary subnet CIDR"
+  description = "Primary subnet CIDR (used for node IPs)"
   type        = string
   default     = "10.1.0.0/20"
+}
+
+variable "pods_cidr" {
+  description = "Secondary CIDR range for pod IPs. Must not overlap with network_cidr, subnet_primary_cidr, or services_cidr."
+  type        = string
+  default     = "10.4.0.0/14"
+}
+
+variable "services_cidr" {
+  description = "Secondary CIDR range for service (ClusterIP) IPs. Must not overlap with network_cidr, subnet_primary_cidr, or pods_cidr."
+  type        = string
+  default     = "10.8.0.0/20"
 }
 
 ################################################################################

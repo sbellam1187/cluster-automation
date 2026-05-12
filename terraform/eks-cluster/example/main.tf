@@ -23,6 +23,7 @@ module "aws_eks" {
   availability_zones   = var.availability_zones
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
+  pod_subnet_cidrs     = var.pod_subnet_cidrs
 
   # Node Groups
   node_groups = var.node_groups

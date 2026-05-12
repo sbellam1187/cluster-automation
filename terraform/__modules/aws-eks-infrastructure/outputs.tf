@@ -57,6 +57,11 @@ output "public_subnet_ids" {
   value       = local.public_subnet_ids
 }
 
+output "pod_subnet_ids" {
+  description = "Pod subnet IDs (CGNAT range used for pod IP allocation via ENI custom networking)"
+  value       = local.pod_subnet_ids
+}
+
 output "subnet_ids" {
   description = "Map of all subnet names to IDs"
   value       = module.subnets.subnet_id
@@ -131,6 +136,7 @@ output "cluster_summary" {
     vpc_id                 = module.vpc.vpc_id
     private_subnet_count   = length(local.private_subnet_ids)
     public_subnet_count    = length(local.public_subnet_ids)
+    pod_subnet_count       = length(local.pod_subnet_ids)
     node_group_count       = length(aws_eks_node_group.main)
     node_group_names       = keys(aws_eks_node_group.main)
     enabled_log_types      = var.cluster_log_types
