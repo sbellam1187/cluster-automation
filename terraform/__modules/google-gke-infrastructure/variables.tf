@@ -89,10 +89,40 @@ variable "enable_private_cluster" {
   default     = true
 }
 
+variable "master_ipv4_cidr" {
+  description = "CIDR block for the GKE control plane"
+  type        = string
+  default     = "172.16.0.0/28"
+}
+
+variable "master_authorized_networks" {
+  description = "CIDR blocks allowed to access the GKE control plane endpoint"
+  type = list(object({
+    cidr_block   = string
+    display_name = string
+  }))
+  default = [{
+    cidr_block   = "10.0.0.0/8"
+    display_name = "enterprise-private"
+  }]
+}
+
 variable "enable_network_policy" {
   description = "Enable Kubernetes network policy"
   type        = bool
   default     = true
+}
+
+variable "enable_firewall_rules" {
+  description = "Create baseline enterprise firewall rules for GKE nodes and health checks"
+  type        = bool
+  default     = true
+}
+
+variable "health_check_source_ranges" {
+  description = "Source ranges allowed for Google Cloud load balancer health checks"
+  type        = list(string)
+  default     = ["35.191.0.0/16", "130.211.0.0/22"]
 }
 
 ################################################################################
@@ -196,7 +226,7 @@ variable "node_pools" {
 ################################################################################
 
 variable "workload_identity_enabled" {
-  description = "Enable workload identity for pod-to-GSA mapping"
+  description = "Enable workload identity for pod-to-GSA mapping (kept for compatibility with existing callers)"
   type        = bool
   default     = true
 }

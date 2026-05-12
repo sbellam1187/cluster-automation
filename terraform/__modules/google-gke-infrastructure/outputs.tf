@@ -139,7 +139,20 @@ output "workload_pool" {
 
 output "workload_identity_enabled" {
   description = "Workload Identity enabled status"
-  value       = true
+  value       = local.workload_identity_enabled
+}
+
+################################################################################
+# Firewall Outputs
+################################################################################
+
+output "firewall_rule_names" {
+  description = "Firewall rule names created for GKE networking"
+  value = {
+    internal         = try(google_compute_firewall.gke_internal[0].name, null)
+    master_to_node   = try(google_compute_firewall.gke_master_to_node[0].name, null)
+    health_checks    = try(google_compute_firewall.gke_health_checks[0].name, null)
+  }
 }
 
 ################################################################################
@@ -170,7 +183,7 @@ output "cluster_summary" {
     network_name                 = google_compute_network.main.name
     subnet_cidr                  = google_compute_subnetwork.main.ip_cidr_range
     private_cluster              = var.enable_private_cluster
-    workload_identity_enabled    = true
+    workload_identity_enabled    = local.workload_identity_enabled
     network_policy_enabled       = var.enable_network_policy
     http_load_balancing_enabled  = var.enable_http_load_balancing
     cloud_logging_enabled        = var.enable_cloud_logging
