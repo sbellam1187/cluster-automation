@@ -7,8 +7,8 @@ Enterprise-ready GKE infrastructure module - Complete stack with VPC, security, 
 ✅ **VPC Network** - Configurable network with secondary IP ranges  
 ✅ **Private Cluster** - Private nodes with Cloud NAT for egress  
 ✅ **Workload Identity** - Pod-to-GCP service account mapping (modern workload IAM)  
-✅ **Network Security** - Kubernetes network policy support  
-✅ **RBAC & IAM** - Full role-based access control setup  
+✅ **Network Security** - Kubernetes network policy + explicit firewall rules  
+✅ **IAM** - Service accounts and Workload Identity bindings  
 ✅ **Multiple Node Pools** - Support for different workload types  
 ✅ **Monitoring & Logging** - Cloud Logging and Cloud Monitoring integration  
 ✅ **Shielded Nodes** - GKE security hardening with secure boot  
@@ -28,7 +28,7 @@ Enterprise-ready GKE infrastructure module - Complete stack with VPC, security, 
 - Regional cluster (multi-zone failover)
 - Auto-repair and auto-upgrade enabled
 - Scheduled maintenance windows
-- Master authorized networks with fine-grained control
+- Master authorized networks with explicit CIDR configuration
 
 ### Observability
 - Cloud Logging integration (container logs)
@@ -40,6 +40,7 @@ Enterprise-ready GKE infrastructure module - Complete stack with VPC, security, 
 - VPC Native networking (efficient IP usage)
 - Secondary IP ranges for pods and services
 - Cloud NAT for private node egress
+- Explicit firewall rules for internal traffic, control plane access, and health checks
 - Customizable network policies
 
 ## Usage
@@ -133,7 +134,11 @@ module "gke" {
 - `subnet_primary_cidr` - Primary subnet CIDR (default: 10.1.0.0/20)
 - `subnet_secondary_ranges` - Pod and service CIDR ranges
 - `enable_private_cluster` - Enable private cluster (default: true)
+- `master_ipv4_cidr` - GKE control plane CIDR (default: 172.16.0.0/28)
+- `master_authorized_networks` - Allowed CIDRs for control plane endpoint (falls back to `subnet_primary_cidr` if set empty)
 - `enable_network_policy` - Enable Kubernetes network policy (default: true)
+- `enable_firewall_rules` - Create baseline GKE firewall rules (default: true)
+- `health_check_source_ranges` - Allowed source ranges for LB health checks
 
 ### Features & Add-ons
 - `enable_http_load_balancing` - Enable load balancing add-on (default: true)
@@ -206,6 +211,9 @@ module "gke" {
 ### Workload Identity
 - `workload_pool` - Workload pool (project.svc.id.goog)
 - `workload_identity_enabled` - Workload Identity status
+
+### Firewall Rules
+- `firewall_rule_names` - Firewall rules created for internal/master/health-check traffic
 
 ### Access
 - `gke_auth_command` - Command to authenticate with cluster
@@ -310,6 +318,16 @@ eval "$(terraform output -raw gke_auth_command)"
 
 - **google-gke-cluster** - Component module (creates just the GKE cluster)
 - **google-gke-infrastructure** - Stack module (complete VPC + network + GKE + workload identity)
+
+## Internal File Organization
+
+The `google-gke-infrastructure` stack module is split by responsibility:
+
+- `network.tf` - VPC, subnet, Cloud NAT, and firewall rules
+- `iam.tf` - GKE and Workload Identity service accounts + IAM bindings
+- `cluster.tf` - GKE control plane configuration
+- `node-pools.tf` - Managed node pools
+- `workload-identity.tf` - Kubernetes service account annotations for Workload Identity
 
 ## Support
 
