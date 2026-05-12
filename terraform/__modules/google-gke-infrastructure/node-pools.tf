@@ -53,11 +53,11 @@ resource "google_container_node_pool" "pools" {
     )
 
     # Network tags
-    tags = distinct(concat(
+    tags = concat(
       each.value.tags,
       var.tags,
       [local.node_network_tag]
-    ))
+    )
 
     # Taints
     dynamic "taint" {

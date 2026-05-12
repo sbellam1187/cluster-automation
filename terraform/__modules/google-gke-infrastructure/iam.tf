@@ -25,7 +25,7 @@ resource "google_project_iam_member" "gke_cluster_monitoring" {
 ################################################################################
 
 resource "google_service_account" "workload_identity" {
-  for_each     = local.workload_identity_namespaces
+  for_each     = toset(var.workload_identity_namespaces)
   account_id   = "${var.cluster_name}-wi-${each.value}"
   display_name = "Workload Identity - ${var.cluster_name} / ${each.value}"
   project      = var.project_id

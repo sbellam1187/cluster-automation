@@ -226,7 +226,7 @@ variable "node_pools" {
 ################################################################################
 
 variable "workload_identity_enabled" {
-  description = "Enable workload identity for pod-to-GSA mapping (kept for compatibility with existing callers)"
+  description = "Enable workload identity for pod-to-GSA mapping"
   type        = bool
   default     = true
 }

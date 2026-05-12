@@ -139,7 +139,7 @@ output "workload_pool" {
 
 output "workload_identity_enabled" {
   description = "Workload Identity enabled status"
-  value       = local.workload_identity_enabled
+  value       = true
 }
 
 ################################################################################
@@ -183,7 +183,7 @@ output "cluster_summary" {
     network_name                 = google_compute_network.main.name
     subnet_cidr                  = google_compute_subnetwork.main.ip_cidr_range
     private_cluster              = var.enable_private_cluster
-    workload_identity_enabled    = local.workload_identity_enabled
+    workload_identity_enabled    = true
     network_policy_enabled       = var.enable_network_policy
     http_load_balancing_enabled  = var.enable_http_load_balancing
     cloud_logging_enabled        = var.enable_cloud_logging

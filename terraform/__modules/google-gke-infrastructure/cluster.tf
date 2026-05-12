@@ -23,11 +23,8 @@ resource "google_container_cluster" "main" {
   }
 
   # Enable Workload Identity
-  dynamic "workload_identity_config" {
-    for_each = local.workload_identity_enabled ? [1] : []
-    content {
-      workload_pool = "${var.project_id}.svc.id.goog"
-    }
+  workload_identity_config {
+    workload_pool = "${var.project_id}.svc.id.goog"
   }
 
   # Private cluster configuration
