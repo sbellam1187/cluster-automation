@@ -101,10 +101,7 @@ variable "master_authorized_networks" {
     cidr_block   = string
     display_name = string
   }))
-  default = [{
-    cidr_block   = "10.0.0.0/8"
-    display_name = "enterprise-private"
-  }]
+  default = []
 }
 
 variable "enable_network_policy" {
@@ -181,6 +178,10 @@ variable "maintenance_window_hour" {
   description = "Hour of day for maintenance window (UTC)"
   type        = number
   default     = 2
+  validation {
+    condition     = var.maintenance_window_hour >= 0 && var.maintenance_window_hour <= 23
+    error_message = "maintenance_window_hour must be between 0 and 23."
+  }
 }
 
 ################################################################################

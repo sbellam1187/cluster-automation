@@ -135,7 +135,7 @@ module "gke" {
 - `subnet_secondary_ranges` - Pod and service CIDR ranges
 - `enable_private_cluster` - Enable private cluster (default: true)
 - `master_ipv4_cidr` - GKE control plane CIDR (default: 172.16.0.0/28)
-- `master_authorized_networks` - Allowed CIDRs for control plane endpoint (falls back to `network_cidr` if set empty)
+- `master_authorized_networks` - Allowed CIDRs for control plane endpoint (falls back to `subnet_primary_cidr` if set empty)
 - `enable_network_policy` - Enable Kubernetes network policy (default: true)
 - `enable_firewall_rules` - Create baseline GKE firewall rules (default: true)
 - `health_check_source_ranges` - Allowed source ranges for LB health checks
