@@ -96,7 +96,7 @@ variable "master_ipv4_cidr" {
 }
 
 variable "master_authorized_networks" {
-  description = "CIDR blocks allowed to access the GKE control plane endpoint"
+  description = "CIDR blocks allowed to access the GKE control plane endpoint; when empty, access is limited to subnet_primary_cidr"
   type = list(object({
     cidr_block   = string
     display_name = string

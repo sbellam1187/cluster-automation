@@ -77,9 +77,6 @@ resource "google_container_node_pool" "pools" {
 
   depends_on = [
     google_container_cluster.main,
-    google_compute_router_nat.main,
-    google_compute_firewall.gke_internal,
-    google_compute_firewall.gke_master_to_node,
-    google_compute_firewall.gke_health_checks,
+    google_compute_router_nat.main
   ]
 }
