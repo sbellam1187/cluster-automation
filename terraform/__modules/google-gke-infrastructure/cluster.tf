@@ -35,15 +35,12 @@ resource "google_container_cluster" "main" {
   }
 
   # Master authorized networks
-  dynamic "master_authorized_networks_config" {
-    for_each = length(var.master_authorized_networks) > 0 ? [1] : []
-    content {
-      dynamic "cidr_blocks" {
-        for_each = var.master_authorized_networks
-        content {
-          cidr_block   = cidr_blocks.value.cidr_block
-          display_name = cidr_blocks.value.display_name
-        }
+  master_authorized_networks_config {
+    dynamic "cidr_blocks" {
+      for_each = local.effective_master_authorized_networks
+      content {
+        cidr_block   = cidr_blocks.value.cidr_block
+        display_name = cidr_blocks.value.display_name
       }
     }
   }

@@ -1,5 +1,9 @@
 locals {
   node_network_tag = "${var.cluster_name}-node"
+  effective_master_authorized_networks = length(var.master_authorized_networks) > 0 ? var.master_authorized_networks : [{
+    cidr_block   = var.network_cidr
+    display_name = "cluster-network"
+  }]
 
   internal_source_ranges = distinct(concat(
     [var.subnet_primary_cidr, var.master_ipv4_cidr],
