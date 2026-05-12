@@ -89,10 +89,37 @@ variable "enable_private_cluster" {
   default     = true
 }
 
+variable "master_ipv4_cidr" {
+  description = "CIDR block for the GKE control plane"
+  type        = string
+  default     = "172.16.0.0/28"
+}
+
+variable "master_authorized_networks" {
+  description = "CIDR blocks allowed to access the GKE control plane endpoint. Module logic enforces subnet_primary_cidr as fallback when this list is empty."
+  type = list(object({
+    cidr_block   = string
+    display_name = string
+  }))
+  default = []
+}
+
 variable "enable_network_policy" {
   description = "Enable Kubernetes network policy"
   type        = bool
   default     = true
+}
+
+variable "enable_firewall_rules" {
+  description = "Create baseline enterprise firewall rules for GKE nodes and health checks"
+  type        = bool
+  default     = true
+}
+
+variable "health_check_source_ranges" {
+  description = "Source ranges allowed for Google Cloud load balancer health checks"
+  type        = list(string)
+  default     = ["35.191.0.0/16", "130.211.0.0/22"]
 }
 
 ################################################################################
@@ -151,6 +178,10 @@ variable "maintenance_window_hour" {
   description = "Hour of day for maintenance window (UTC)"
   type        = number
   default     = 2
+  validation {
+    condition     = var.maintenance_window_hour >= 0 && var.maintenance_window_hour <= 23
+    error_message = "maintenance_window_hour must be between 0 and 23."
+  }
 }
 
 ################################################################################

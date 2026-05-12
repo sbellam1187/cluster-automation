@@ -143,6 +143,19 @@ output "workload_identity_enabled" {
 }
 
 ################################################################################
+# Firewall Outputs
+################################################################################
+
+output "firewall_rule_names" {
+  description = "Firewall rule names created for GKE networking"
+  value = {
+    internal         = try(google_compute_firewall.gke_internal[0].name, null)
+    master_to_node   = try(google_compute_firewall.gke_master_to_node[0].name, null)
+    health_checks    = try(google_compute_firewall.gke_health_checks[0].name, null)
+  }
+}
+
+################################################################################
 # Access and Authentication Outputs
 ################################################################################
 
