@@ -36,6 +36,14 @@ module "subnets" {
         availability_zone = local.azs[idx % length(local.azs)]
         type              = "private"
       }
+    },
+    {
+      for idx, cidr in var.pod_subnet_cidrs :
+      "${var.cluster_name}-pods-${idx + 1}" => {
+        cidr_block        = cidr
+        availability_zone = local.azs[idx % length(local.azs)]
+        type              = "pods"
+      }
     }
   )
 
@@ -156,7 +164,7 @@ module "eks_cluster" {
   cluster_version          = var.cluster_version
   cluster_role_arn         = module.eks_cluster_role.role_arn
   subnet_ids               = concat(local.private_subnet_ids, local.public_subnet_ids)
-  eni_configs              = var.eni_configs
+  eni_configs              = merge(local.auto_eni_configs, var.eni_configs)
   platform_admin_role_arns = var.platform_admin_role_arns
   
   # Pod Identity Associations for workload IAM
@@ -247,4 +255,18 @@ locals {
     for name, id in module.subnets.subnet_id : id
     if contains([for idx, _ in var.public_subnet_cidrs : "${var.cluster_name}-public-${idx + 1}"], name)
   ]
+
+  # Extract pod subnet IDs from subnets module
+  pod_subnet_ids = [
+    for name, id in module.subnets.subnet_id : id
+    if contains([for idx, _ in var.pod_subnet_cidrs : "${var.cluster_name}-pods-${idx + 1}"], name)
+  ]
+
+  # Auto-generate ENI configs mapping each AZ to its dedicated pod subnet.
+  # These are merged with any user-supplied eni_configs (user values take precedence).
+  auto_eni_configs = {
+    for idx, cidr in var.pod_subnet_cidrs :
+    local.azs[idx % length(local.azs)] =>
+    module.subnets.subnet_id["${var.cluster_name}-pods-${idx + 1}"]
+  }
 }

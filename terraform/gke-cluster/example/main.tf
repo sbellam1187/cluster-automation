@@ -27,6 +27,16 @@ module "gke" {
   network_name            = "${var.cluster_name}-network"
   network_cidr            = var.network_cidr
   subnet_primary_cidr     = var.subnet_primary_cidr
+  subnet_secondary_ranges = {
+    pods = {
+      range_name    = "pods"
+      ip_cidr_range = var.pods_cidr
+    }
+    services = {
+      range_name    = "services"
+      ip_cidr_range = var.services_cidr
+    }
+  }
   enable_private_cluster  = var.enable_private_cluster
   enable_network_policy   = var.enable_network_policy
 
