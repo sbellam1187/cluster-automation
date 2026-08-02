@@ -258,16 +258,16 @@ module "eks_cluster" {
 
 | Name | Description | Type | Required |
 |------|-------------|------|:--------:|
+| <a name="input_addon_configs"></a> [addon\_configs](#input\_addon\_configs) | Map of addon names to their configurations | <pre>map(object({<br/>    version                     = string<br/>    resolve_conflicts_on_create = optional(string, "OVERWRITE")<br/>    resolve_conflicts_on_update = optional(string, "OVERWRITE")<br/>    configuration_values        = optional(string)<br/>  }))</pre> | yes |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Name of the EKS cluster | `string` | yes |
 | <a name="input_cluster_role_arn"></a> [cluster\_role\_arn](#input\_cluster\_role\_arn) | ARN of the IAM role for the EKS cluster | `string` | yes |
 | <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | Version of the EKS cluster | `string` | yes |
 | <a name="input_ec2_subnet_ids"></a> [ec2\_subnet\_ids](#input\_ec2\_subnet\_ids) | List of subnet IDs for the node groups | `list(string)` | yes |
 | <a name="input_eni_configs"></a> [eni\_configs](#input\_eni\_configs) | Map of AZ to ENIConfig manifest spec | `map(any)` | yes |
-| <a name="input_node_groups"></a> [node\_groups](#input\_node\_groups) | Managed node group definitions | <pre>map(object({<br/>    desired_size         = number<br/>    min_size             = number<br/>    max_size             = number<br/>    instance_types       = list(string)<br/>    labels               = optional(map(string), {})<br/>    node_taints          = optional(map(string), {})<br/>    capacity_type        = optional(string, "ON_DEMAND")<br/>    disk_size            = optional(number, 512)<br/>    orchestrator_version = optional(string, null)<br/>  }))</pre> | yes |
+| <a name="input_node_groups"></a> [node\_groups](#input\_node\_groups) | Managed node group definitions | <pre>map(object({<br/>    desired_size         = number<br/>    min_size             = number<br/>    max_size             = number<br/>    instance_types       = list(string)<br/>    labels               = optional(map(string), {})<br/>    node_taints          = optional(map(string), {})<br/>    capacity_type        = optional(string, "ON_DEMAND")<br/>    disk_size            = optional(number, 512)<br/>    orchestrator_version = optional(string, null)<br/>    force_update_version = optional(bool)<br/>  }))</pre> | yes |
 | <a name="input_node_role_arn"></a> [node\_role\_arn](#input\_node\_role\_arn) | ARN of the IAM role for the EKS node group | `string` | yes |
 | <a name="input_platform_admin_role_arns"></a> [platform\_admin\_role\_arns](#input\_platform\_admin\_role\_arns) | List of ARNs for IAM roles to be granted platform admin access to the EKS cluster | `list(string)` | yes |
 | <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | List of subnet IDs for the EKS cluster | `list(string)` | yes |
-| <a name="input_cni_custom_config"></a> [cni\_custom\_config](#input\_cni\_custom\_config) | Custom configuration for the VPC CNI plugin | `string` | no |
 | <a name="input_pod_identity_associations"></a> [pod\_identity\_associations](#input\_pod\_identity\_associations) | Map of pod identity associations to create | <pre>map(object({<br/>    namespace       = string<br/>    service_account = string<br/>    role_arn        = string<br/>  }))</pre> | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to assign to the EKS cluster | `map(string)` | no |
 | <a name="input_upgrade_policy"></a> [upgrade\_policy](#input\_upgrade\_policy) | Upgrade policy for the EKS cluster | `string` | no |
@@ -282,7 +282,5 @@ module "eks_cluster" {
 | <a name="output_cluster_name"></a> [cluster\_name](#output\_cluster\_name) | cluster name |
 | <a name="output_cluster_oidc_issuer"></a> [cluster\_oidc\_issuer](#output\_cluster\_oidc\_issuer) | cluster OIDC issuer |
 | <a name="output_cluster_security_group_id"></a> [cluster\_security\_group\_id](#output\_cluster\_security\_group\_id) | cluster security group ID |
-| <a name="output_eip_id"></a> [eip\_id](#output\_eip\_id) | ID of EIP |
-| <a name="output_eip_ip"></a> [eip\_ip](#output\_eip\_ip) | IP address of EIP |
 | <a name="output_nodegroup_ids"></a> [nodegroup\_ids](#output\_nodegroup\_ids) | EKS node group IDs |
 <!-- END_TF_DOCS -->

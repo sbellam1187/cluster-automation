@@ -5,5 +5,5 @@ resource "aws_eks_pod_identity_association" "pod_identities" {
   namespace       = each.value.namespace
   service_account = each.value.service_account
   role_arn        = each.value.role_arn
-  depends_on      = [aws_eks_addon.eks_pod_identity_agent]
+  depends_on      = [aws_eks_addon.addon["eks-pod-identity-agent"]]
 }

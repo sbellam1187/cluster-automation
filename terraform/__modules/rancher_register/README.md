@@ -16,7 +16,6 @@
 |------|---------|
 | <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | ~>2.0 |
 | <a name="provider_rancher2"></a> [rancher2](#provider\_rancher2) | ~>8.2 |
-| <a name="provider_random"></a> [random](#provider\_random) | ~>3.5 |
 
 ## Inputs
 
@@ -31,6 +30,7 @@
 | <a name="input_registry_password"></a> [registry\_password](#input\_registry\_password) | registry\_password | `string` | yes |
 | <a name="input_registry_username"></a> [registry\_username](#input\_registry\_username) | registry\_username | `string` | yes |
 | <a name="input_additional_labels"></a> [additional\_labels](#input\_additional\_labels) | Additional labels to apply to Kubernetes resources | `map(string)` | no |
+| <a name="input_allowed_aad_groups"></a> [allowed\_aad\_groups](#input\_allowed\_aad\_groups) | allowed aad groups for runway to filter on clusters | `string` | no |
 | <a name="input_azad_mgmt_group_admin_reader"></a> [azad\_mgmt\_group\_admin\_reader](#input\_azad\_mgmt\_group\_admin\_reader) | azad\_mgmt\_group\_admin\_reader | `string` | no |
 | <a name="input_azad_mgmt_group_owner"></a> [azad\_mgmt\_group\_owner](#input\_azad\_mgmt\_group\_owner) | azad\_mgmt\_group\_owner | `map(string)` | no |
 | <a name="input_azad_mgmt_group_reader"></a> [azad\_mgmt\_group\_reader](#input\_azad\_mgmt\_group\_reader) | azad\_mgmt\_group\_reader | `map(string)` | no |

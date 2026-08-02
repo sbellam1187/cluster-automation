@@ -11,6 +11,11 @@ variable "runway_status" {
   type        = string
   default     = "active"
 }
+variable "allowed_aad_groups" {
+  description = "allowed aad groups for runway to filter on clusters"
+  type        = string
+  default     = ""
+}
 variable "location" {
   description = "location"
   type        = string

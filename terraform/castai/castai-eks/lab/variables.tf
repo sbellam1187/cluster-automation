@@ -170,6 +170,7 @@ variable "castai_node_templates" {
     castai_node_configuration_name = optional(string, "aa_castai_node_conf_default")
     is_default                     = optional(bool, false)
     is_enabled                     = optional(bool, true)
+    clm_enabled                    = optional(bool, true)
     should_taint                   = optional(bool, false)
     custom_labels = optional(map(string), {
       aa_castai_agentpool = "common"
@@ -183,7 +184,7 @@ variable "castai_node_templates" {
       compute_optimized_state       = optional(string, "disabled")
       storage_optimized_state       = optional(string, "disabled")
       is_gpu_only                   = optional(bool, false)
-      min_cpu                       = optional(number, 12)
+      min_cpu                       = optional(number, 8)
       max_cpu                       = optional(number, 32)
       min_memory                    = optional(number, 4096)
       max_memory                    = optional(number, 131072)
@@ -192,11 +193,11 @@ variable "castai_node_templates" {
       burstable_instances           = optional(string, "disabled")
       customer_specific             = optional(string, "disabled")
       instance_families = optional(object({
-        include = optional(list(string), ["r5a", "m5a"])
+        include = optional(list(string), ["m5", "m5a", "m6i", "m6a", "m7i", "m7i-flex", "m7a", "m8a", "c5", "c5a", "c6i", "c6a", "c7i", "c7i-flex", "c7a", "c8a", "r5", "r5a", "r5b", "r6i", "r6a", "r7i", "r7a", "r8a"])
         exclude = optional(list(string), [])
       }), {})
       custom_priority = optional(object({
-        instance_families = optional(list(string), ["r5a", "m5a"])
+        instance_families = optional(list(string), ["r6i", "r6a", "r5", "r5a", "r5b", "r7i", "r7a", "r8a", "m6i", "m6a", "c6i", "c6a", "m5", "m5a", "c5", "c5a", "m7i", "m7i-flex", "m7a", "m8a", "c7i", "c7i-flex", "c7a", "c8a"])
         spot              = optional(bool, false)
         on_demand         = optional(bool, true)
       }), {})

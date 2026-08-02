@@ -28,3 +28,16 @@ variable "public_routes" {
   }))
   default = {}
 }
+
+variable "allowed_cluster_names" {
+  description = "EKS cluster names allowed to access Interface VPC endpoints. Each cluster name is resolved to its cluster security group ID."
+  type        = set(string)
+  default     = []
+}
+
+
+variable "interface_endpoint_services" {
+  description = "Short AWS service names for Interface endpoints (e.g. [\"sts\", \"sqs\", \"ecr.api\"]). The module builds the full service name from the current region and creates a shared security group."
+  type        = set(string)
+  default     = []
+}

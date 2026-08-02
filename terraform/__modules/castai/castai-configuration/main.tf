@@ -211,6 +211,7 @@ resource "castai_node_template" "castai_node_template" {
   for_each         = var.castai_node_autoscale_enable ? var.castai_node_templates : {}
   cluster_id       = var.castai_cluster_id
   name             = each.key
+  clm_enabled      = try(each.value.clm_enabled, null)
   is_default       = each.value.is_default
   is_enabled       = each.value.is_enabled
   configuration_id = castai_node_configuration.node_configuration[each.value.castai_node_configuration_name].id

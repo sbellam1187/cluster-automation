@@ -1,0 +1,220 @@
+
+# KPaaS AWS Resources
+
+**AWS Portal:** https://aa.awsapps.com/start/
+```url
+https://aa.awsapps.com/start/
+```
+## Regions & Zones
+- us-east-1 (North Virginia)
+  - us-east-1a
+  - us-east-1b
+  - us-east-1c
+- us-west-2 (Oregon)
+  - us-east-2a
+  - us-east-2b
+  - us-east-2c
+
+Code |Name | AZs |
+:--- | :--- | :--- |
+us-east-1 | US East (N. Virginia) | 6 |
+us-west-2 | US West (Oregon) | 4 |
+
+## Accounts
+- **Dev(lab)**
+```yaml
+   Name: aa-aws-nxop-dev 
+   ID: 178549792225
+```
+- **Nonprod** 
+```yaml 
+   Name: aa-aws-kaas-nonprod
+   ID: 285282426848
+``` 
+- **Prod:**
+```yaml
+   Name: aa-aws-kaas-prod
+   ID: 045755618773
+``` 
+**AWS Resource Hierarchy**
+<img width="1002" height="1092" alt="AWS_KPaaS_NXOP-Account Hierarchy drawio" src="https://github.com/user-attachments/assets/233db425-3e08-473f-8ce6-a531fa4a1136" />
+
+**Resource Hierarchy -- Azure vs AWS**
+<img width="1312" height="566" alt="AWS-EKS (1)-Azure - AWS drawio" src="https://github.com/user-attachments/assets/b2d1d1a7-f540-4572-890c-fa3f7b65b624" />
+
+**AWS KPaaS Resource Topology**
+<img width="1682" height="762" alt="AWS_KPaaS_NXOP-Page-2 drawio" src="https://github.com/user-attachments/assets/ab1be70c-597c-4c7a-bb38-e4e3ec9642d3" />
+
+## Network
+- **VPC**: Virtual Private Cloud
+  - Primary Network: **/19**
+    - K8s API & Control-plane components
+    - EC2 Instance (Nodes)
+    - Other AWS Native services (ex: S3 Storage)
+  - Secondary Network: **/16**
+    - Pods
+  - Service Network: **/16**
+    - K8s Service Endpoints
+> [!TIP]
+> **/16** = 64k IPs | **/19** = 8k IPs | **/23** = 512 IPs | **/25** = 128 IPs
+
+**External AA IPs (Outbound)**
+us-east-1 | us-west-2
+:--- | :--- |
+107.23.85.50 | 54.201.184.106 |
+3.94.233.146 | 52.41.176.111 |
+54.163.231.142 | 44.231.83.160 |
+44.223.209.164 | 54.185.121.1 |
+23.21.45.206 | - |
+44.193.157.122 | - |
+
+**VPC & Subnets**
+Env | Region | Name | ID | CIDR |
+:--- | :--- | :--- | :--- | :--- |
+Dev (lab) | us-east-1 | AA_KAAS_N_EA_10.218.56.0_21_VPC | vpc-0a45e492b26d5d479 | 10.218.56.0/21 |
+Dev (lab) | us-west-2 | AA_KAAS_N_WE_10.219.56.0_21_VPC | vpc-016ee4d3019b6eb56 | 10.219.56.0/21 |
+Nonprod | us-east-1 | AA_KAAS_N_EA_10.218.64.0_19_VPC | vpc-04f33088d2bf9974a | 10.218.64.0/19 |
+Nonprod | us-west-2 | AA_KAAS_N_WE_10.219.64.0_19_VPC | vpc-01d736f3291515ffd | 10.219.64.0/19 |
+Prod | us-east-1 | AA_KAAS_P_EA_10.218.160.0_19_VPC | vpc-0e297549887e3bfa4 | 10.218.160.0/19 |
+Prod | us-west-2 | AA_KAAS_P_WE_10.219.160.0_19_VPC | vpc-089c76fb40a216e11 | 10.219.160.0/19 |
+
+**CIDR Breakdown**
+
+<details>
+<summary><b>Sample</b></summary>
+
+```yaml
+VPC Name: AA_KAAS_N_EA_10.218.64.0_19_VPC
+VPC ID: vpc-04f33088d2bf9974a
+
+10.218.64.0/19
+└── 10.218.64.0/23
+    └── EC2 (Nodes)
+        └── kaas-nonprod-us-east-1a-ec2: 10.218.64.0/23
+└── 10.218.66.0/23
+    └── EC2 (Nodes)
+        └── kaas-nonprod-us-east-1b-ec2: 10.218.66.0/23
+└── 10.218.68.0/23
+    └── EC2 (Nodes)
+        └── kaas-nonprod-us-east-1c-ec2: 10.218.68.0/23
+└── 10.218.70.0/23
+    └── xENI (DP to CP)
+        ├── kaas-nonprod-us-east-1a-xeni: 10.218.70.0/25
+        ├── kaas-nonprod-us-east-1b-xeni: 10.218.70.128/25
+        └── kaas-nonprod-us-east-1c-xeni: 10.218.71.0/25
+    └── Unused
+        └── 10.219.71.128/25
+└── 10.218.72.0/23
+    └── Public
+        ├── kaas-nonprod-us-east-1a-public: 10.218.72.0/25
+        ├── kaas-nonprod-us-east-1b-public: 10.218.72.128/25
+        └── kaas-nonprod-us-east-1c-public: 10.218.73.0/25
+    └── Unused
+        └── 10.218.73.128/25
+├── 10.218.74.0/23
+├── 10.218.76.0/23
+├── 10.218.78.0/23
+├── 10.218.80.0/23
+├── 10.218.82.0/23
+├── 10.218.84.0/23
+├── 10.218.86.0/23
+├── 10.218.88.0/23
+├── 10.218.90.0/23
+├── 10.218.92.0/23
+└── 10.218.94.0/23
+
+100.64.0.0/16 (Secondary)
+└── 100.64.0.0/18
+    └── Pods
+        └── kaas-nonprod-us-east-1a-pods: 100.64.0.0/18
+└── 100.64.64.0/18
+    └── Pods
+        └── kaas-nonprod-us-east-1b-pods: 100.64.64.0/18
+└── 100.64.128.0/18
+    └── Pods
+        └── kaas-nonprod-us-east-1c-pods: 100.64.128.0/18
+└── 100.64.192.0/18 (Unused)
+```
+</details>
+
+**AWS EKS Topology**
+<img width="2091" height="1442" alt="AWS_Network_Design-Page-1 drawio" src="https://github.com/user-attachments/assets/39c5660e-e436-4b01-ba28-ef5818ae55c3" />
+
+
+**AWS Network Flow**
+<img width="2401" height="2681" alt="AWS_Network_Design-Page-3" src="https://github.com/user-attachments/assets/dddcc5c2-dd47-4d38-8e1d-941e77e600e1" />
+
+**Akamai Ingress Flow -- Azure vs AWS**
+
+<img width="1625" height="1372" alt="AWS_KPaaS_NXOP-Page-1 drawio" src="https://github.com/user-attachments/assets/273e8ed9-6fa9-492c-b75b-65250b46f75b" />
+
+
+**AWS vs Azure Load Balancer**
+<img width="1464" height="835" alt="2026-05-29_0-14-43" src="https://github.com/user-attachments/assets/d63cc339-853f-41a3-9a9e-15612911e5b7" />
+
+
+## KPaaS EKS Clusters
+
+Env |Region | Name | Comments |
+:--- | :--- | :--- | :--- |
+Lab | us-east-1| kaas-runway-lab-eks-1002-eastus | KPaaS Internal Use|
+Lab | us-west-2| kaas-runway-lab-eks-1002-westus | KPaaS Internal Use|
+Nonprod | us-east-1| kaas-nxop-np-eks-3001-eastus| NXOP Dedicated|
+Nonprod | us-west-2| kaas-nxop-np-eks-3001-westus| NXOP Dedicated|
+Prod | us-east-1| kaas-nxop-p-eks-8001-eastus| NXOP Dedicated|
+Prod | us-west-2| kaas-nxop-p-eks-8001-westus| NXOP Dedicated|
+
+> [!NOTE]
+> Deployment to NXOP clusters from RunwayUI is restricted to following AAD group
+> - AAD_KAAS_NXOP_NP_AWS_CLUSTER_ACCESS 
+> - AAD_KAAS_NXOP_P_AWS_CLUSTER_ACCESS 
+
+## KPaaS -- AKS vs EKS Feature Availability
+
+
+| Feature | Description | Status(AKS) | Status(AWS) |
+|---------|-------------|:---:|:---:|
+| **Region** | Cloud provider regions where KPaaS services available | eastus  westus  | us-east-1  us-west-2 |
+| **Zone** | Multi zone(3) support within target region | eastus  | us-east-1  us-west-2 |
+| **Stateless Applications** | Full support for Stateless microservices with "WebApp"| ✅  | ✅   |
+| **Batch Workload** |  Batch/Long Running/Optimization workload available with "Conductor" | ✅ | 🚧 |
+| **Ephemeral Workloads** | Ephemeral Cluster | ✅ | 🚧 |
+| **PCI Workloads** | Dedicated clusters for PCI-compliant workloads | ✅ | ❌ |
+| **Self-service Portal** | Integration with Runway for simplified onboarding and workload management | ✅ | ✅ |
+| **CI Integration** | Built-in support for CI workflows managed by DTE when deployed via Runway Templates | ✅ | ✅ |
+| **CD Integration** | Built-in support for CD using ArgoCD | ✅ | ✅ |
+| **Cluster Access** | Rancher for cluster access and viewing Kubernetes resources | ✅ | ✅ |
+| **Role-based Access Control** | Fine-grained permissions for namespace access using Azure AAD | ✅ | ✅ |
+| **Pod/Workload Identity** | Identity to access cloud provider service using IAM  | 📅 |  ✅ |
+| **Auto Scaling** | CPU-based HPA and KEDA (ServiceBus, BlobStorage, Cron) | ✅ | ✅ |
+| **Resource Optimization** | Workload Right Sizing using CastAI | ✅ | 🚧 |
+| **Apigee** | Apigee Microgateway Integrations using `webapp` | ✅ | ✅ |
+| **Apollo Graph QL** | Apollog Graph QL availability | ✅ | ✅ |
+| **Secret Management** | HashiCorp Vault integrations for secrets | ✅ | ✅ |
+| **Logging** | Centralized log collection Via Mezmos | ✅ | ✅ |
+| **Metrics** | Comprehensive application and cluster metrics in Dynatrace | ✅ | ✅ |
+| **Traffic Management (Akamai)** | GTM via Akamai across cloud regions for North-South traffic | ✅ | ✅ |
+| **Traffic Management (Infoblox)** | GTM for AA Internal network only for North-South traffic | 🔒 | NA |
+| **Service Mesh Support** | Istio Service Mesh capabilities | ✅ | ✅ |
+| **Shared Clusters** | Shared clusters | ✅ | 🚧 |
+| **Dedicated Clusters** | Dedicated clusters | ✅ | ✅ |
+| **Network Segmentation** | Granular control over pod-to-pod communication using Istio| ✅ | ✅ |
+| **Canary Deployments** | Canary deployments for % based traffic routing using Istio| 📅 | 📅 |
+| **Persistent Storage** | Persistent volumes or Remote Storage Mount | 📅 | ✅ |
+| **StatefulSets** | Kubernetes StatefulSets for ordered, persistent applications | ❌ | ❌ |
+
+✅ --> Available
+☑️ --> Available Partially
+🚧 --> In development
+📅 --> Future release (In backlog) 
+🔒 --> Available only on PCI clusters
+❌ --> Not available
+
+## References
+- https://github.com/AAInternal/runway-kubernetes-cluster-automation/discussions/5778
+- https://github.com/AAInternal/runway-kubernetes-cluster-automation/discussions/5929
+- https://github.com/AAInternal/runway-kubernetes-cluster-automation/discussions/6517
+- https://github.com/AAInternal/runway-kubernetes-cluster-automation/discussions/6090
+- https://github.com/AAInternal/runway-kubernetes-cluster-automation/discussions/6501
+- [EKS Terraform](https://github.com/AAInternal/runway-kubernetes-cluster-automation/tree/main/terraform/eks-cluster)
+- [NXOP Architecture](https://fantastic-adventure-v9n1e1o.pages.github.io/dns-resolution-architecture.html)

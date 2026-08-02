@@ -1,4 +1,15 @@
 # Changelog
+## v3.0.0-tf-eks-cluster+pr7730
+- Removed EIP provisioning from Terraform; EIP allocation is now handled by the Istio gateway service object via the aws-load-balancer-controller.
+
+## v2.8.0-tf-eks-cluster+pr7503
+- Refactored EKS addon resources in the child module to a single `for_each` driven `aws_eks_addon` implementation, with addon settings passed via `addon_configs` for consistent version and conflict handling.
+- Moved addon configuration ownership to the lab/root module for environment-specific control and safer upgrades.
+
+## v2.7.0-tf-eks-cluster+pr7436
+- Enables Amazon VPC CNI IPv4 prefix delegation via addon configuration so Pods can be allocated IPs from delegated /28 prefixes on pod ENIs (instead of individual secondary IPs), improving pod density and reducing EC2 API calls.
+    - Adds ENABLE_PREFIX_DELEGATION=true to the VPC CNI addon configuration_values.
+    - Updates the JSON formatting in the CNI config to include the required comma between env entries.
 
 ## v2.6.0-tf-eks-cluster+pr7387
 - Updating the addon management approach from automatic data source selection to manual version control via variables for precise version management across all environments.

@@ -18,5 +18,5 @@ resource "helm_release" "raw_eni_config" {
     EOF
   ]
 
-  depends_on = [aws_eks_cluster.eks_cluster, aws_eks_addon.cni, aws_vpc_security_group_ingress_rule.allow_tls_ipv4]
+  depends_on = [aws_eks_cluster.eks_cluster, aws_eks_addon.addon["vpc-cni"], aws_vpc_security_group_ingress_rule.allow_tls_ipv4]
 }

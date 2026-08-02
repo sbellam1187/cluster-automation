@@ -26,13 +26,3 @@ output "nodegroup_ids" {
   value       = [for ng in aws_eks_node_group.ng_pool : ng.id]
   description = "EKS node group IDs"
 }
-
-output "eip_id" {
-  description = "ID of EIP"
-  value       = aws_eip.eip.allocation_id
-}
-
-output "eip_ip" {
-  description = "IP address of EIP"
-  value       = aws_eip.eip.public_ip
-}

@@ -26,3 +26,21 @@ variable "aws_account_id" {
   description = "AWS Account ID"
   type        = string
 }
+
+variable "otlp_nxop_cross_account_role_arn" {
+  description = "NXOP account role ARN to ingest OTLP metrics into NXOP cloudwatch"
+  type        = string
+  default     = null
+}
+
+variable "fis_orchestrator_account_id" {
+  description = "AWS account ID of the FIS orchestrator account"
+  type        = string
+  default     = ""
+}
+
+variable "fis_target_cluster_arns" {
+  description = "EKS cluster ARNs to target for FIS pod fault experiments"
+  type        = list(string)
+  default     = []
+}

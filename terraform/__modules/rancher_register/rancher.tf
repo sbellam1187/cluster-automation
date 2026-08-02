@@ -12,6 +12,7 @@ resource "rancher2_cluster" "runway_cluster_import_rancher" {
     "dx_cluster_name"        = var.dx_cluster_name
     "location"               = var.location
     "runway_status"          = var.runway_status
+    "allowed_aad_groups"     = var.allowed_aad_groups
   }
 }
 

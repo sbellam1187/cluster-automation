@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.0-tf-aws-subnets+pr7906
+- Adding VPC endpoints block
+
 ## v0.2.0-tf-aws-subnets+pr7423
 - Importing public route tables into terraform
 

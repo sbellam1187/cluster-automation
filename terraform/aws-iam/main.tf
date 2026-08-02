@@ -34,22 +34,6 @@ data "aws_iam_policy_document" "node_assume" {
   }
 }
 
-module "eks_node_role" {
-  source             = "../__modules/aws-iam-roles"
-  role_name          = "eks-node-role-${var.environment}"
-  assume_role_policy = data.aws_iam_policy_document.node_assume.json
-  policy_arns = [
-    "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
-    "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
-    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-  ]
-  tags = {
-    Environment = var.environment
-    Shared      = "true"
-  }
-}
-
 data "aws_iam_policy_document" "pod_assume" {
   statement {
     effect = "Allow"
@@ -93,237 +77,8 @@ data "aws_iam_policy_document" "github_actions_assume" {
   }
 }
 
-module "github_actions_role" {
-  source             = "../__modules/aws-iam-roles"
-  role_name          = "github-actions-role-${var.environment}"
-  assume_role_policy = data.aws_iam_policy_document.github_actions_assume.json
-  policy_arns = [
-    "arn:aws:iam::aws:policy/AdministratorAccess"
-  ]
-  tags = {
-    Environment = var.environment
-    Shared      = "true"
-  }
-}
-
 data "aws_s3_bucket" "velero_s3_bucket" {
   bucket = var.velero_s3_bucket_name
-}
-
-module "s3_policy_velero" {
-  source      = "../__modules/aws-iam-policy"
-  policy_name = "s3-velero-policy-${var.environment}"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:ListBucket",
-          "s3:PutObject",
-          "s3:DeleteObject",
-        ]
-        Resource = [
-          "arn:aws:s3:::${data.aws_s3_bucket.velero_s3_bucket.id}",
-          "arn:aws:s3:::${data.aws_s3_bucket.velero_s3_bucket.id}/*"
-        ]
-      }
-    ]
-  })
-}
-
-module "pod_identity_role_velero" {
-  source             = "../__modules/aws-iam-roles"
-  role_name          = "pod-identity-role-velero-${var.environment}"
-  assume_role_policy = data.aws_iam_policy_document.pod_assume.json
-  policy_arns        = [module.s3_policy_velero.arn]
-  tags = {
-    Environment = var.environment
-    Shared      = "true"
-  }
-}
-
-module "ack_eks_pod_identity_policy" {
-  source      = "../__modules/aws-iam-policy"
-  policy_name = "ack-eks-pod-identity-policy-${var.environment}"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "ackekspodidentitypolicy",
-        "Effect" : "Allow",
-        "Action" : [
-          "eks:CreatePodIdentityAssociation",
-          "eks:TagResource"
-        ],
-        "Resource" : "arn:aws:eks:*:${var.aws_account_id}:cluster/*"
-      },
-      {
-        "Sid" : "ackekspodidentitypolicytag",
-        "Effect" : "Allow",
-        "Action" : [
-          "eks:DescribePodIdentityAssociation",
-          "eks:UpdatePodIdentityAssociation",
-          "eks:DeletePodIdentityAssociation",
-          "eks:TagResource"
-        ],
-        "Resource" : "arn:aws:eks:*:${var.aws_account_id}:podidentityassociation/*/*"
-      },
-      {
-        "Sid" : "PassRoleToAnyRole",
-        "Effect" : "Allow",
-        "Action" : [
-          "iam:PassRole",
-          "iam:GetRole"
-        ],
-        "Resource" : "*"
-      },
-      {
-        "Sid" : "EC2SubnetAccess",
-        "Effect" : "Allow",
-        "Action" : [
-          "ec2:DescribeSubnets"
-        ],
-        "Resource" : "*"
-      }
-    ]
-  })
-}
-
-module "cluster_autoscaler_policy" {
-  source      = "../__modules/aws-iam-policy"
-  policy_name = "cluster-autoscaler-policy-${var.environment}"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "autoscaling:DescribeAutoScalingGroups",
-          "autoscaling:DescribeAutoScalingInstances",
-          "autoscaling:DescribeLaunchConfigurations",
-          "autoscaling:DescribeScalingActivities",
-          "ec2:DescribeImages",
-          "ec2:DescribeInstanceTypes",
-          "ec2:DescribeLaunchTemplateVersions",
-          "ec2:GetInstanceTypesFromInstanceRequirements",
-          "eks:DescribeNodegroup"
-        ],
-        "Resource" : ["*"]
-      },
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "autoscaling:SetDesiredCapacity",
-          "autoscaling:TerminateInstanceInAutoScalingGroup"
-        ],
-        "Resource" : ["*"]
-      }
-    ]
-  })
-}
-
-module "ack_iam_pod_identity_policy" {
-  source      = "../__modules/aws-iam-policy"
-  policy_name = "ack-iam-pod-identity-policy-${var.environment}"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "VisualEditor0",
-        "Effect" : "Allow",
-        "Action" : [
-          "iam:GetGroup",
-          "iam:CreateGroup",
-          "iam:DeleteGroup",
-          "iam:UpdateGroup",
-          "iam:GetRole",
-          "iam:CreateRole",
-          "iam:DeleteRole",
-          "iam:UpdateRole",
-          "iam:PutRolePermissionsBoundary",
-          "iam:PutUserPermissionsBoundary",
-          "iam:GetUser",
-          "iam:CreateUser",
-          "iam:DeleteUser",
-          "iam:UpdateUser",
-          "iam:GetPolicy",
-          "iam:CreatePolicy",
-          "iam:DeletePolicy",
-          "iam:GetPolicyVersion",
-          "iam:CreatePolicyVersion",
-          "iam:DeletePolicyVersion",
-          "iam:ListPolicyVersions",
-          "iam:ListPolicyTags",
-          "iam:ListAttachedGroupPolicies",
-          "iam:GetGroupPolicy",
-          "iam:PutGroupPolicy",
-          "iam:AttachGroupPolicy",
-          "iam:DetachGroupPolicy",
-          "iam:DeleteGroupPolicy",
-          "iam:ListAttachedRolePolicies",
-          "iam:ListRolePolicies",
-          "iam:GetRolePolicy",
-          "iam:PutRolePolicy",
-          "iam:AttachRolePolicy",
-          "iam:DetachRolePolicy",
-          "iam:DeleteRolePolicy",
-          "iam:ListAttachedUserPolicies",
-          "iam:ListUserPolicies",
-          "iam:GetUserPolicy",
-          "iam:PutUserPolicy",
-          "iam:AttachUserPolicy",
-          "iam:DetachUserPolicy",
-          "iam:DeleteUserPolicy",
-          "iam:ListRoleTags",
-          "iam:ListUserTags",
-          "iam:TagPolicy",
-          "iam:UntagPolicy",
-          "iam:TagRole",
-          "iam:UntagRole",
-          "iam:TagUser",
-          "iam:UntagUser",
-          "iam:RemoveClientIDFromOpenIDConnectProvider",
-          "iam:ListOpenIDConnectProviderTags",
-          "iam:UpdateOpenIDConnectProviderThumbprint",
-          "iam:UntagOpenIDConnectProvider",
-          "iam:AddClientIDToOpenIDConnectProvider",
-          "iam:DeleteOpenIDConnectProvider",
-          "iam:GetOpenIDConnectProvider",
-          "iam:TagOpenIDConnectProvider",
-          "iam:CreateOpenIDConnectProvider",
-          "iam:UpdateAssumeRolePolicy"
-        ],
-        "Resource" : "*"
-      }
-    ]
-  })
-}
-
-module "ack_pod_identity_role" {
-  source             = "../__modules/aws-iam-roles"
-  role_name          = "ack-pod-identity-role-${var.environment}"
-  assume_role_policy = data.aws_iam_policy_document.pod_assume.json
-  policy_arns = [
-    module.ack_eks_pod_identity_policy.arn,
-    module.ack_iam_pod_identity_policy.arn
-  ]
-  tags = {
-    Environment = var.environment
-    Shared      = "true"
-  }
-}
-
-module "cluster_autoscaler_role" {
-  source             = "../__modules/aws-iam-roles"
-  role_name          = "cluster-autoscaler-role-${var.environment}"
-  assume_role_policy = data.aws_iam_policy_document.pod_assume.json
-  policy_arns        = [module.cluster_autoscaler_policy.arn]
-  tags = {
-    Environment = var.environment
-    Shared      = "true"
-  }
 }
 
 module "ec2_eks_role" {
@@ -844,6 +599,89 @@ module "lb_controller_eks_role" {
   role_name          = "lbController-eks-role-${var.environment}"
   assume_role_policy = data.aws_iam_policy_document.pod_assume.json
   policy_arns        = [module.lb_controller_eks_policy.arn]
+  tags = {
+    Environment = var.environment
+    Shared      = "true"
+  }
+}
+
+module "opentelemetry_otlp_podIdentity_policy" {
+  source      = "../__modules/aws-iam-policy"
+  policy_name = "opentelemetry-otlp-podIdentity-policy-${var.environment}"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "OpentelemetryOTLPCrossAccountAssumeRole",
+        "Effect" : "Allow",
+        "Action" : [
+          "sts:AssumeRole",
+          "sts:TagSession"
+        ],
+        "Resource" : [
+          var.otlp_nxop_cross_account_role_arn
+        ]
+      }
+    ]
+  })
+}
+
+module "opentelemetry_otlp_podIdentity_role" {
+  source             = "../__modules/aws-iam-roles"
+  role_name          = "adot-col-otlp-ingest-podIdentity-role-${var.environment}"
+  assume_role_policy = data.aws_iam_policy_document.pod_assume.json
+  policy_arns        = [module.opentelemetry_otlp_podIdentity_policy.arn]
+  tags = {
+    Environment = var.environment
+    Shared      = "true"
+  }
+}
+
+data "aws_iam_policy_document" "fis_target_assume" {
+  count = var.fis_orchestrator_account_id != "" && length(var.fis_target_cluster_arns) > 0 ? 1 : 0
+
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${var.fis_orchestrator_account_id}:role/fis-nxop-l6-kpaas-role-${var.environment}"]
+    }
+    actions = ["sts:AssumeRole"]
+
+    condition {
+      test     = "StringLike"
+      variable = "sts:ExternalId"
+      values   = ["arn:aws:fis:${var.region}:${var.fis_orchestrator_account_id}:experiment/*"]
+    }
+  }
+}
+
+module "fis_target_eks_podfaults_policy" {
+  count       = var.fis_orchestrator_account_id != "" && length(var.fis_target_cluster_arns) > 0 ? 1 : 0
+  source      = "../__modules/aws-iam-policy"
+  policy_name = "fis-targetEksPodFaults-policy-${var.environment}"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "EKSAccessForPodFaultsOnly"
+        Effect = "Allow"
+        Action = [
+          "eks:DescribeCluster",
+          "eks:AccessKubernetesApi"
+        ]
+        Resource = var.fis_target_cluster_arns
+      }
+    ]
+  })
+}
+
+module "fis_target_eks_podfaults_role" {
+  count              = var.fis_orchestrator_account_id != "" && length(var.fis_target_cluster_arns) > 0 ? 1 : 0
+  source             = "../__modules/aws-iam-roles"
+  role_name          = "fis-targetEksPodFaults-role-${var.environment}"
+  assume_role_policy = data.aws_iam_policy_document.fis_target_assume[0].json
+  policy_arns        = [module.fis_target_eks_podfaults_policy[0].arn]
   tags = {
     Environment = var.environment
     Shared      = "true"

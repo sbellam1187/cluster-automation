@@ -1,4 +1,7 @@
 # Changelog
+## v1.1.1-tf-castai-config+pr7579
+- Add an optional container live migration parameter
+
 ## v1.1.0-tf-castai-config+pr6972
 - make relancing schedule name unique to avoid conflicts and castai allows only unique names
 
